@@ -78,7 +78,16 @@ export function KBTask({ card, onCardClick }: TaskCardProps) {
                         )}
                     </Flex>
                 </VStack>
-                <Box {...attributes} {...listeners} cursor="grab" p={2} ml={2} _hover={{ bg: "gray.200" }} rounded="md">
+                <Box
+                    {...attributes}
+                    {...listeners}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    cursor="grab"
+                    p={2}
+                    ml={2}
+                    _hover={{ bg: "gray.200" }}
+                    rounded="md"
+                >
                     <DragHandleIcon color="gray.500" />
                 </Box>
             </Flex>

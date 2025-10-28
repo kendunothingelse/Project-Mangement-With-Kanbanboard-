@@ -18,8 +18,9 @@ import {
     useDisclosure
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { Board, dummyBoards } from "../api/dummy-data";
+import { Board } from "../api/dummy-data";
 import { BoardCard } from "../components/workspace-components/BoardCard";
+import apiClient from "../api/api";
 
 export default function WorkspacePage() {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -27,20 +28,27 @@ export default function WorkspacePage() {
     const [newBoardName, setNewBoardName] = useState("");
 
     useEffect(() => {
-        // Simulate fetching data
-        setBoards(dummyBoards);
+        // Fetch boards from the API
+        apiClient.get<Board[]>('/boards')
+            .then(response => {
+                setBoards(response.data);
+            })
+            .catch(error => console.error("Error fetching boards:", error));
     }, []);
 
     const handleCreateBoard = () => {
         if (newBoardName.trim() === "") return;
-        const newBoard: Board = {
-            id: `board-${Date.now()}`,
+        const newBoard = {
             name: newBoardName,
-            workspaceId: "ws-1",
+            workspaceId: "ws-1", // This can be dynamic in a real app
         };
-        setBoards(prev => [...prev, newBoard]);
-        setNewBoardName("");
-        onClose();
+        apiClient.post<Board>('/boards', newBoard)
+            .then(response => {
+                setBoards(prev => [...prev, response.data]);
+                setNewBoardName("");
+                onClose();
+            })
+            .catch(error => console.error("Error creating board:", error));
     };
 
     return (

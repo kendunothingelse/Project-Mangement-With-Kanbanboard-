@@ -26,10 +26,11 @@ import {
     Heading,
     Spacer
 } from "@chakra-ui/react";
-import { Card, Member, dummyMembers, Label } from "../../api/dummy-data";
+import { Card, Member, Label } from "../../api/dummy-data";
 import { AddIcon, CloseIcon } from "@chakra-ui/icons";
 import { DueDateSelector } from "../shared/DueDateSelector";
 import { LabelManager } from "../shared/LabelManager";
+import apiClient from "../../api/api";
 
 interface CardDetailModalProps {
     isOpen: boolean;
@@ -37,49 +38,39 @@ interface CardDetailModalProps {
     card: Card | null;
     onUpdateCard: (updatedCard: Card) => void;
     allLabels: Label[];
+    allMembers: Member[];
     onCreateLabel: (name: string, color: string) => void;
     onUpdateLabel: (label: Label) => void;
 }
 
-export function CardDetailModal({ isOpen, onClose, card, onUpdateCard, allLabels, onCreateLabel, onUpdateLabel }: CardDetailModalProps) {
+export function CardDetailModal({ isOpen, onClose, card, onUpdateCard, allLabels, allMembers, onCreateLabel, onUpdateLabel }: CardDetailModalProps) {
     if (!card) return null;
 
-    const handleMemberToggle = (memberId: string) => {
+    const handleMemberToggle = (memberId: number) => {
         const isMemberAssigned = card.members?.some(m => m.id === memberId);
-        let updatedMembers: Member[];
+        const endpoint = `/cards/${card!.id}/members/${memberId}`;
+        const method = isMemberAssigned ? 'delete' : 'post';
 
-        if (isMemberAssigned) {
-            updatedMembers = card.members?.filter(m => m.id !== memberId) || [];
-        } else {
-            const memberToAdd = dummyMembers.find(m => m.id === memberId);
-            if (memberToAdd) {
-                updatedMembers = [...(card.members || []), memberToAdd];
-            } else {
-                updatedMembers = card.members || [];
-            }
-        }
-        onUpdateCard({ ...card, members: updatedMembers });
+        apiClient[method](endpoint).then(response => {
+            onUpdateCard(response.data);
+        });
     };
 
     const handleDueDateChange = (date: Date | null) => {
-        onUpdateCard({ ...card, dueDate: date ? date.toISOString() : undefined });
+        const updatedCard = { ...card, dueDate: date ? date.toISOString() : undefined };
+        apiClient.put(`/cards/${card.id}`, updatedCard).then(response => {
+            onUpdateCard(response.data);
+        });
     };
 
-    const handleLabelToggle = (labelId: string) => {
+    const handleLabelToggle = (labelId: number) => {
         const isLabelAssigned = card.labels?.some(l => l.id === labelId);
-        let updatedLabels: Label[];
+        const endpoint = `/cards/${card.id}/labels/${labelId}`;
+        const method = isLabelAssigned ? 'delete' : 'post';
 
-        if (isLabelAssigned) {
-            updatedLabels = card.labels?.filter(l => l.id !== labelId) || [];
-        } else {
-            const labelToAdd = allLabels.find(l => l.id === labelId);
-            if (labelToAdd) {
-                updatedLabels = [...(card.labels || []), labelToAdd];
-            } else {
-                updatedLabels = card.labels || [];
-            }
-        }
-        onUpdateCard({ ...card, labels: updatedLabels });
+        apiClient[method](endpoint).then(response => {
+            onUpdateCard(response.data);
+        });
     };
 
     return (
@@ -110,12 +101,12 @@ export function CardDetailModal({ isOpen, onClose, card, onUpdateCard, allLabels
                                     <PopoverCloseButton />
                                     <PopoverHeader>Assign Members</PopoverHeader>
                                     <PopoverBody>
-                                        <CheckboxGroup value={card.members?.map(m => m.id)}>
+                                        <CheckboxGroup value={card.members?.map(m => String(m.id))}>
                                             <VStack align="start">
-                                                {dummyMembers.map(member => (
+                                                {allMembers.map(member => (
                                                     <Checkbox
                                                         key={member.id}
-                                                        value={member.id}
+                                                        value={String(member.id)}
                                                         isChecked={card.members?.some(m => m.id === member.id)}
                                                         onChange={() => handleMemberToggle(member.id)}
                                                     >
@@ -165,7 +156,7 @@ export function CardDetailModal({ isOpen, onClose, card, onUpdateCard, allLabels
                     </VStack>
                 </ModalBody>
                 <ModalFooter>
-                    <Button colorScheme="blue" onClick={onClose}>
+                    <Button variant="ghost" onClick={onClose}>
                         Close
                     </Button>
                 </ModalFooter>

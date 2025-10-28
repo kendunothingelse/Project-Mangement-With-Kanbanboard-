@@ -28,13 +28,13 @@ import { AddIcon, EditIcon } from "@chakra-ui/icons";
 interface LabelManagerProps {
     allLabels: Label[];
     cardLabels: Label[];
-    onToggleLabel: (labelId: string) => void;
+    onToggleLabel: (labelId: number) => void;
     onCreateLabel: (name: string, color: string) => void;
     onUpdateLabel: (label: Label) => void;
 }
 
 const availableColors = [
-    "gray.500", "red.500", "orange.500", "yellow.500", "green.500", "teal.500", "blue.500", "cyan.500", "purple.500", "pink.500",
+    "gray", "red", "orange", "yellow", "green", "teal", "blue", "cyan", "purple", "pink",
 ];
 
 export function LabelManager({ allLabels, cardLabels, onToggleLabel, onCreateLabel, onUpdateLabel }: LabelManagerProps) {
@@ -76,7 +76,7 @@ export function LabelManager({ allLabels, cardLabels, onToggleLabel, onCreateLab
         onOpen();
     };
 
-    const isLabelChecked = (labelId: string) => cardLabels.some(l => l.id === labelId);
+    const isLabelChecked = (labelId: number) => cardLabels.some(l => l.id === labelId);
 
     return (
         <>
@@ -93,7 +93,7 @@ export function LabelManager({ allLabels, cardLabels, onToggleLabel, onCreateLab
                             {allLabels.map(label => (
                                 <Flex key={label.id} align="center">
                                     <Checkbox isChecked={isLabelChecked(label.id)} onChange={() => onToggleLabel(label.id)}>
-                                        <Tag colorScheme={label.color.split('.')[0]}>{label.name}</Tag>
+                                        <Tag colorScheme={label.color}>{label.name}</Tag>
                                     </Checkbox>
                                     <Button size="xs" variant="ghost" ml="auto" onClick={() => openEditForm(label)}>
                                         <EditIcon />
@@ -125,7 +125,7 @@ export function LabelManager({ allLabels, cardLabels, onToggleLabel, onCreateLab
                                             key={color}
                                             as="button"
                                             h="25px"
-                                            bg={color}
+                                            bg={`${color}.500`}
                                             rounded="md"
                                             border={newLabelColor === color ? "2px solid black" : "2px solid transparent"}
                                             onClick={() => setNewLabelColor(color)}

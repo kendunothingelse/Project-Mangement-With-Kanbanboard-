@@ -9,7 +9,7 @@ import { NewCardCreator } from "./NewCardCreator";
 interface ColumnProps {
     list: List;
     onCardClick: (card: Card) => void;
-    onAddCard: (listId: string, cardTitle: string) => void;
+    onAddCard: (listId: number, cardTitle: string) => void;
 }
 
 export function KBColumn({ list, onCardClick, onAddCard }: ColumnProps) {
