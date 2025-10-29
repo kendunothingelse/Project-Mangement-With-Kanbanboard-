@@ -21,12 +21,15 @@ export function KBColumn({ list, onCardClick, onAddCard }: ColumnProps) {
         transition,
         isDragging,
     } = useSortable({
-        id: list.id,
+        id: `list-${list.id}`, // Prefix list ID
         data: {
             type: "List",
             list,
         },
     });
+
+    // Ensure cards is always an array to avoid `Cannot read properties of null (reading 'map')`
+    const cards = list.cards ?? [];
 
     const style = {
         transition,
@@ -58,8 +61,9 @@ export function KBColumn({ list, onCardClick, onAddCard }: ColumnProps) {
             </Heading>
 
             <VStack align="stretch" spacing={3} flex="1" overflowY="auto" pr={2}>
-                <SortableContext items={list.cards.map(c => c.id)} strategy={verticalListSortingStrategy}>
-                    {list.cards.map((card) => (
+                {/* Prefix card IDs */}
+                <SortableContext items={cards.map(c => `card-${c.id}`)} strategy={verticalListSortingStrategy}>
+                    {cards.map((card) => (
                         <KBTask key={card.id} card={card} onCardClick={onCardClick} />
                     ))}
                 </SortableContext>

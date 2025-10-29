@@ -19,7 +19,7 @@ export function KBTask({ card, onCardClick }: TaskCardProps) {
         transition,
         isDragging,
     } = useSortable({
-        id: card.id,
+        id: `card-${card.id}`, // Prefix card ID
         data: {
             type: "Card",
             card,
