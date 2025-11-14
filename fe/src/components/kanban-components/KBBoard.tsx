@@ -1,6 +1,6 @@
 // src/components/kanban-components/KBBoard.tsx
-import { useState } from "react";
-import { Flex, useDisclosure } from "@chakra-ui/react";
+import {useState} from "react";
+import {Box, Flex, Input, InputGroup, InputLeftElement, Text, useDisclosure, VStack} from "@chakra-ui/react";
 import {
     DndContext,
     DragEndEvent,
@@ -11,17 +11,29 @@ import {
     useSensors,
     closestCorners,
 } from "@dnd-kit/core";
-import { arrayMove, SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
-import { KBColumn } from "./KBColumn";
-import { Card, initialBoardData, List, Label, dummyLabels } from "../../api/dummy-data";
-import { CardDetailModal } from "../workspace-components/CardDetailModal";
+import {arrayMove, SortableContext, horizontalListSortingStrategy} from "@dnd-kit/sortable";
+import {KBColumn} from "./KBColumn";
+import {Card, initialBoardData, List, Label, dummyLabels} from "../../api/dummy-data";
+import {CardDetailModal} from "../workspace-components/CardDetailModal";
+import {SearchIcon} from "@chakra-ui/icons";
+
+type Suggestion = {
+    id: string;
+    title: string;
+    listId: string;
+    listTitle: string;
+    card: Card;
+};
 
 export function KBBoard() {
     const [lists, setLists] = useState<List[]>(initialBoardData);
     const [labels, setLabels] = useState<Label[]>(dummyLabels);
     const [activeCard, setActiveCard] = useState<Card | null>(null);
     const [selectedCard, setSelectedCard] = useState<Card | null>(null);
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const {isOpen, onOpen, onClose} = useDisclosure();
+    const [query, setQuery] = useState("");
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [highlightedIdx, setHighlightedIdx] = useState(0);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -30,6 +42,32 @@ export function KBBoard() {
             },
         })
     );
+    const normalized = query.trim().toLowerCase();
+    const displayedLists = normalized
+        ? lists.map(list => ({
+            ...list,
+            cards: list.cards.filter(card =>
+                card.title.toLowerCase().includes(normalized)
+            ),
+        }))
+        : lists;
+
+    const suggestions: Suggestion[] =
+        normalized.length === 0
+            ? []
+            : lists
+                .flatMap((list) =>
+                    list.cards.map((card) => ({
+                        id: card.id,
+                        title: card.title,
+                        listId: list.id,
+                        listTitle: list.title,
+                        card,
+                    }))
+                )
+                .filter((s) => s.title.toLowerCase().includes(normalized))
+                .slice(0, 8);
+
 
     const handleCardClick = (card: Card) => {
         setSelectedCard(card);
@@ -46,7 +84,7 @@ export function KBBoard() {
     };
 
     const handleCreateLabel = (name: string, color: string) => {
-        const newLabel: Label = { id: `lbl-${Date.now()}`, name, color };
+        const newLabel: Label = {id: `lbl-${Date.now()}`, name, color};
         setLabels(prev => [...prev, newLabel]);
     };
 
@@ -88,7 +126,7 @@ export function KBBoard() {
     };
 
     const handleDragOver = (event: DragOverEvent) => {
-        const { active, over } = event;
+        const {active, over} = event;
         if (!over) return;
 
         const activeId = active.id;
@@ -140,7 +178,7 @@ export function KBBoard() {
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event;
+        const {active, over} = event;
         if (!over || active.id === over.id) {
             setActiveCard(null);
             return;
@@ -157,8 +195,105 @@ export function KBBoard() {
         setActiveCard(null);
     };
 
+    const selectSuggestion = (s: Suggestion) => {
+        handleCardClick(s.card);
+        setQuery("");
+        setShowSuggestions(false);
+        setHighlightedIdx(0);
+    };
+    const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+        if (!showSuggestions && suggestions.length > 0) setShowSuggestions(true);
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setHighlightedIdx((i) => (i + 1) % Math.max(1, suggestions.length));
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setHighlightedIdx((i) =>
+                (i - 1 + Math.max(1, suggestions.length)) % Math.max(1, suggestions.length)
+            );
+        } else if (e.key === "Enter") {
+            if (suggestions.length > 0) {
+                e.preventDefault();
+                selectSuggestion(suggestions[Math.min(highlightedIdx, suggestions.length - 1)]);
+            }
+        } else if (e.key === "Escape") {
+            setShowSuggestions(false);
+        }
+    };
+
     return (
         <>
+            <Box p={4} pt={0}>
+                <Box position="relative" maxW="420px">
+
+                    <InputGroup maxW="400px">
+                        <InputLeftElement pointerEvents="none">
+                            <SearchIcon color="gray.400"/>
+                        </InputLeftElement>
+                        <Input
+                            placeholder="Search cards by title..."
+                            value={query}
+                            onChange={(e) => {
+                                setQuery(e.target.value);
+                                setShowSuggestions(true);
+                                setHighlightedIdx(0);
+                            }}
+                            onFocus={() => {
+                                if (normalized.length > 0) setShowSuggestions(true);
+                            }
+                            }
+                            onBlur={() => {
+                                // Delay to allow click on suggestion
+                                setTimeout(() => setShowSuggestions(false), 120);
+                            }}
+                            onKeyDown={handleKeyDown}
+
+                            bg="white"
+                        />
+                    </InputGroup>
+                    {showSuggestions && suggestions.length > 0 && (
+                        <Box
+                            position="absolute"
+                            top="100%"
+                            left={0}
+                            right={0}
+                            mt={1}
+                            bg="white"
+                            borderWidth="1px"
+                            rounded="md"
+                            shadow="md"
+                            zIndex={50}
+                            maxH="300px"
+                            overflowY="auto"
+                        >
+                            <VStack align="stretch" spacing={0}>
+                                {suggestions.map((s, idx) => (
+                                    <Box
+                                        key={s.id}
+                                        px={3}
+                                        py={2}
+                                        cursor="pointer"
+                                        bg={idx === highlightedIdx ? "blue.50" : "white"}
+                                        _hover={{bg: "blue.100"}}
+                                        onMouseEnter={() => setHighlightedIdx(idx)}
+                                        onMouseDown={e => {
+                                            e.preventDefault();
+                                            selectSuggestion(s);
+                                        }}
+                                    >
+                                        <Text fontWeight="medium">
+                                            {s.title}
+                                        </Text>
+                                        <Text fontSize="xs" color="gray.500">
+                                            List: {s.listTitle}
+                                        </Text>
+                                    </Box>
+                                ))}
+                            </VStack>
+                        </Box>
+                    )}
+                </Box>
+            </Box>
             <DndContext
                 sensors={sensors}
                 collisionDetection={closestCorners}

@@ -17,14 +17,24 @@ import {
     SimpleGrid,
     useDisclosure
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { Board, dummyBoards } from "../api/dummy-data";
-import { BoardCard } from "../components/workspace-components/BoardCard";
+import {useEffect, useState} from "react";
+import {Board, dummyBoards} from "../api/dummy-data";
+import {BoardCard} from "../components/workspace-components/BoardCard";
+import {useNavigate} from "react-router-dom";
+import {useAuth} from "../context/AuthContext";
 
 export default function WorkspacePage() {
-    const { isOpen, onOpen, onClose } = useDisclosure();
     const [boards, setBoards] = useState<Board[]>([]);
     const [newBoardName, setNewBoardName] = useState("");
+    const {isOpen, onOpen, onClose} = {
+        isOpen: false,
+        onOpen: () => (document.getElementById("create-board-modal-open") as HTMLButtonElement)?.click(),
+        onClose: () => {
+        }
+    } as any;
+
+    const {logout} = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Simulate fetching data
@@ -42,26 +52,32 @@ export default function WorkspacePage() {
         setNewBoardName("");
         onClose();
     };
-
+    const handleLogout = () => {
+        logout();
+        navigate("/login", {replace: true});
+    };
     return (
         <>
             <Container maxW="6xl" py={10}>
                 <Heading mb={6} textAlign="center">
                     My Workspace
                 </Heading>
-                <Button onClick={onOpen} mb={6} colorScheme="blue">Create New Board</Button>
-                <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={6}>
+                <Box mb={6} display="flex" gap={3}>
+                    <Button onClick={onOpen} mb={6} colorScheme="blue">Create New Board</Button>
+                    <Button variant="outline" onClick={handleLogout}>Logout</Button>
+                </Box>
+                <SimpleGrid columns={{base: 1, sm: 2, md: 3, lg: 4}} spacing={6}>
                     {boards.map(board => (
-                        <BoardCard key={board.id} board={board} />
+                        <BoardCard key={board.id} board={board}/>
                     ))}
                 </SimpleGrid>
             </Container>
 
             <Modal isOpen={isOpen} onClose={onClose}>
-                <ModalOverlay />
+                <ModalOverlay/>
                 <ModalContent>
                     <ModalHeader>Create a new board</ModalHeader>
-                    <ModalCloseButton />
+                    <ModalCloseButton/>
                     <ModalBody>
                         <FormControl>
                             <FormLabel>Board Name</FormLabel>
