@@ -18,7 +18,7 @@ import {
     useDisclosure
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { Board } from "../api/dummy-data";
+import { Board } from "../api/entity";
 import { BoardCard } from "../components/workspace-components/BoardCard";
 import apiClient from "../api/api";
 

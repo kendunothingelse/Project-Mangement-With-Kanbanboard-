@@ -1,7 +1,7 @@
 // src/components/BoardCard.tsx
 import { Box, Heading } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import { Board } from "../../api/dummy-data";
+import { Board } from "../../api/entity";
 
 interface BoardCardProps {
     board: Board;

@@ -3,7 +3,7 @@ import { Box, Heading, VStack } from "@chakra-ui/react";
 import { useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { KBTask } from "./KBTask";
-import { Card, List } from "../../api/dummy-data";
+import { Card, List } from "../../api/entity";
 import { NewCardCreator } from "./NewCardCreator";
 
 interface ColumnProps {

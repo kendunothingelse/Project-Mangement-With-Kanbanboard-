@@ -1,7 +1,7 @@
 // src/hooks/useKanbanDnd.ts
 import { DragEndEvent, DragOverEvent, DragStartEvent, UniqueIdentifier } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
-import { Card, List } from "../api/dummy-data";
+import { Card, List } from "../api/entity";
 import apiClient from "../api/api";
 import React from "react";
 

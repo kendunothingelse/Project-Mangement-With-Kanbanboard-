@@ -3,7 +3,7 @@ import { Box, Container, Heading, Spinner, Text } from "@chakra-ui/react";
 import { KBBoard } from "../components/kanban-components/KBBoard";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Board, List } from "../api/dummy-data";
+import { Board, List } from "../api/entity";
 import apiClient from "../api/api";
 
 export default function KanbanPage() {

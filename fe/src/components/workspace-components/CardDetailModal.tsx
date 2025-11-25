@@ -26,7 +26,7 @@ import {
     Heading,
     Spacer
 } from "@chakra-ui/react";
-import { Card, Member, Label } from "../../api/dummy-data";
+import { Card, Member, Label } from "../../api/entity";
 import { AddIcon, CloseIcon } from "@chakra-ui/icons";
 import { DueDateSelector } from "../shared/DueDateSelector";
 import { LabelManager } from "../shared/LabelManager";
@@ -89,7 +89,7 @@ export function CardDetailModal({ isOpen, onClose, card, onUpdateCard, allLabels
                             <Spacer />
                             <AvatarGroup size="sm" max={4} mr={2}>
                                 {card.members?.map(member => (
-                                    <Avatar key={member.id} name={member.name} src={member.avatarUrl} />
+                                    <Avatar key={member.id} name={member.fullname} src={member.avatarUrl} />
                                 ))}
                             </AvatarGroup>
                             <Popover>
@@ -110,7 +110,7 @@ export function CardDetailModal({ isOpen, onClose, card, onUpdateCard, allLabels
                                                         isChecked={card.members?.some(m => m.id === member.id)}
                                                         onChange={() => handleMemberToggle(member.id)}
                                                     >
-                                                        {member.name}
+                                                        {member.fullname}
                                                     </Checkbox>
                                                 ))}
                                             </VStack>

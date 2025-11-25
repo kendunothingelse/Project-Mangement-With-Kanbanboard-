@@ -10,7 +10,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
 import { KBColumn } from "./KBColumn";
-import { Card, List, Label, Board, Member } from "../../api/dummy-data";
+import { Card, List, Label, Board, Member } from "../../api/entity";
 import { CardDetailModal } from "../workspace-components/CardDetailModal";
 import apiClient from "../../api/api";
 import { NewListCreator } from "./NewListCreator";

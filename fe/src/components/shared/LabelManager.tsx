@@ -21,7 +21,7 @@ import {
     useDisclosure,
     VStack
 } from "@chakra-ui/react";
-import { Card, Label } from "../../api/dummy-data";
+import { Card, Label } from "../../api/entity";
 import { useState } from "react";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
 

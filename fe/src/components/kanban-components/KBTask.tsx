@@ -2,7 +2,7 @@
 import { Avatar, AvatarGroup, Badge, Box, Flex, HStack, Spacer, Tag, Text, VStack } from "@chakra-ui/react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Card } from "../../api/dummy-data";
+import { Card } from "../../api/entity";
 import { CalendarIcon, ChatIcon, CheckIcon, DragHandleIcon } from "@chakra-ui/icons";
 
 interface TaskCardProps {
@@ -72,7 +72,7 @@ export function KBTask({ card, onCardClick }: TaskCardProps) {
                         {card.members && (
                             <AvatarGroup size="sm" max={3}>
                                 {card.members.map(member => (
-                                    <Avatar key={member.id} name={member.name} src={member.avatarUrl} />
+                                    <Avatar key={member.id} name={member.fullname} src={member.avatarUrl} />
                                 ))}
                             </AvatarGroup>
                         )}

@@ -1,9 +1,13 @@
-// src/data/dummy-data.ts
-// src/data/dummy-data.ts
+// src/data/model.ts
+// src/data/model.ts
 export interface Member {
     id: number;
-    name: string;
+    username: string;
+    password: string;
+    email: string;
+    fullname: string;
     avatarUrl?: string;
+    role?: 'ADMIN' | 'USER';
 }
 
 export interface Label {
