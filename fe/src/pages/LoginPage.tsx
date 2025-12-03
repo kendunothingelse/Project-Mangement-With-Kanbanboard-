@@ -1,30 +1,78 @@
-import {Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Input} from "@chakra-ui/react";
-import {useState} from "react";
-import {login} from "../api/auth";
-import {useNavigate} from "react-router-dom";
-import WorkspacePage from "./WorkspacePage";
-
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Heading,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+import { useState } from "react";
+import { login } from "../api/auth";
+import { Link, useNavigate } from "react-router-dom";
 
 export const LoginPage = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    let navigate = useNavigate();
-    const submitLogin = () => {
-        // Implement login logic here
-        login(username, password);
-        navigate("/");
-    }
-    const isError = username === ''
-    return (
-        <>
-            <FormControl isInvalid={isError}>
-                <FormLabel>Username</FormLabel>
-                <Input type='text' value={username} onChange={(e) => setUsername(e.target.value)}/>
-                <FormLabel>Password</FormLabel>
-                <Input type='password' value={password} onChange={(e) => setPassword(e.target.value)}/>
-                <Button type="submit" onClick={submitLogin}> Login </Button>
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-            </FormControl>
-        </>
-    );
+  const submitLogin = async () => {
+    if (!email || !password) return;
+    await login(email, password);
+    navigate("/");
+  };
+
+  return (
+    <Box
+      minH="100vh"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      bg="gray.50"
+      px={4}
+    >
+      <Box w="full" maxW="md" bg="white" boxShadow="md" borderRadius="md" p={8}>
+        <VStack spacing={6} align="stretch">
+          <Box textAlign="center">
+            <Heading size="lg">Đăng Nhập</Heading>
+            <Text mt={2} color="gray.600">
+              Chào mừng bạn trở lại
+            </Text>
+          </Box>
+
+          <FormControl isRequired>
+            <FormLabel>Email</FormLabel>
+            <Input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com"
+            />
+          </FormControl>
+
+          <FormControl isRequired>
+            <FormLabel>Mật khẩu</FormLabel>
+            <Input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••"
+            />
+          </FormControl>
+
+          <Button colorScheme="blue" onClick={submitLogin} isDisabled={!email || !password}>
+            Đăng Nhập
+          </Button>
+
+          <Text textAlign="center" color="gray.600">
+            Chưa có tài khoản?{" "}
+            <Link to="/register" style={{ textDecoration: "underline" }}>
+              Đăng Ký
+            </Link>
+          </Text>
+        </VStack>
+      </Box>
+    </Box>
+  );
 };
