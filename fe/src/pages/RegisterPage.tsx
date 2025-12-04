@@ -21,7 +21,7 @@ const RegisterPage = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState([""]);
+  const [errors, setErrors] = useState<string[]>([]);
   const navigate = useNavigate();
 
   const submitRegister = async () => {
