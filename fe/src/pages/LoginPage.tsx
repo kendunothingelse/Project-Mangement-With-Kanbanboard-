@@ -11,16 +11,35 @@ import {
 import { useState } from "react";
 import { login } from "../api/auth";
 import { Link, useNavigate } from "react-router-dom";
+import { LoginSchema, TLoginSchema } from "../validation/login.schema";
 
 export const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<string[]>([]);
   const navigate = useNavigate();
 
   const submitLogin = async () => {
-    if (!email || !password) return;
-    await login(email, password);
-    navigate("/");
+    const formData: TLoginSchema = {
+      email,
+      password,
+    };
+
+    // 1. validate dữ liệu
+    const validate = LoginSchema.safeParse(formData);
+
+    if (!validate.success) {
+      const errorsZod = validate.error.issues;
+      const errors = errorsZod?.map(item => `${item.message} (${item.path[0]})`);
+      console.log(errors);
+
+      setErrors(errors);
+      return;
+    }
+    // 2. Gọi API login
+
+    // await login(email, password);
+    // navigate("/");
   };
 
   return (

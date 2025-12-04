@@ -30,8 +30,8 @@ const RegisterPage = () => {
       email,
       password,
     };
-
-    const validate = await RegisterSchema.safeParseAsync(formData);
+    // 1. validate dữ liệu
+    const validate = RegisterSchema.safeParse(formData);
 
     if (!validate.success) {
       const errorsZod = validate.error.issues;
@@ -42,6 +42,9 @@ const RegisterPage = () => {
       return;
     }
 
+    // 2. Gọi api check email tồn tại
+
+    // 3. Email ok → gửi API register
     setErrors([]);
     // await register({ username, email, password });
     // navigate("/login");
